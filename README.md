@@ -153,3 +153,64 @@ Canvas API를 활용하여 별도의 이미지 편집 라이브러리 없이 브
 ---
 
 # Project Structure
+WONWON-STUDIO
+│
+├── index.html
+├── css/
+│ └── style.css
+├── js/
+│ └── script.js
+├── assets/
+│ └── images/
+│
+└── README.md
+
+
+---
+
+# Verification
+
+프로젝트의 구현 기능 및 동작 검증은 아래 검증 안내서를 통해 확인할 수 있습니다.
+
+Verification Guide:
+검증 안내서 URL 입력
+
+검증 항목:
+
+- 서비스 정상 실행 여부
+- 캔버스 렌더링 확인
+- 이미지 추가 및 편집 기능
+- 텍스트 레이어 기능
+- 이모지 및 카오모지 기능
+- 레이어 관리 기능
+- PNG 저장 기능
+
+---
+
+# Preview
+
+서비스 실행 화면 및 주요 기능 시연 이미지
+
+(이미지 또는 GIF 삽입)
+
+---
+
+# Development Environment
+
+- OS: Windows / macOS
+- Browser: Chrome, Edge 등 최신 Chromium 기반 브라우저
+- 별도 설치 없이 웹 브라우저에서 실행 가능
+
+---
+
+# Contributors
+
+| 이름 | 역할 |
+| --- | --- |
+| 이름 입력 | 기획 / UI 설계 / Frontend Development |
+
+---
+
+# License
+
+This project was developed for educational purposes.
