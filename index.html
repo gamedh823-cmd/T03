@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WONWON STUDIO · Layer Editor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&family=Newsreader:ital,wght@1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0c11;--panel:#12151d;--panel-solid:#11141b;--surface:#161a24;
+  --surface2:#1e232f;--text:#f1f3f8;--muted:#8d94a6;--faint:#5c6376;--line:rgba(255,255,255,.08);
+  --accent:#5b84f7;--accent-ink:#0c1330;--accent-soft:rgba(91,132,247,.14);--danger:#e2665a;--danger-soft:rgba(226,102,90,.12);
+  --success:#7cbf8e;--radius:12px;--radius-lg:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Pretendard',system-ui,-apple-system,sans-serif}
+html,body{min-height:100%;background:var(--bg);color:var(--text)}
+body{overflow-x:hidden}
+button,input,select,textarea{font:inherit}
+button{color:inherit}
+svg{display:block}
+header{height:64px;position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;border-bottom:1px solid var(--line);background:rgba(16,15,13,.88);backdrop-filter:blur(20px)}
+.brand{display:flex;align-items:center;gap:12px}.brand-mark{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;
+  background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:14px}
+.brand h1{font-size:15px;font-weight:500;letter-spacing:.01em;color:var(--text)}.brand h1 em{font-family:'Newsreader',serif;font-style:italic;color:var(--accent);font-weight:500}.brand small{display:block;color:var(--faint);font-size:11px;letter-spacing:.01em;margin-top:1px;font-weight:400}
+.header-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.app-scale-holder{height:calc(100vh - 64px);overflow:auto;display:flex;justify-content:center;align-items:stretch}
+.app-shell{width:100%;max-width:1560px;height:100%;margin:0;padding:18px;display:grid;
+  grid-template-columns:minmax(300px,336px) minmax(480px,1fr) minmax(280px,320px);gap:16px}
+.panel{min-width:0;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius-lg);
+  overflow:hidden;display:flex;flex-direction:column;height:100%;max-height:100%}
+.panel-head{padding:18px 20px 14px}.panel-title{font-size:13px;font-weight:600;letter-spacing:.03em}
+.panel-sub{margin-top:5px;color:var(--muted);font-size:12.5px;line-height:1.55}
+.panel-body{padding:6px 20px 20px;overflow:auto;scrollbar-width:thin;scrollbar-color:#3a352c transparent}
+.section{padding:0 0 20px;margin-bottom:20px;border-top:1px solid var(--line);padding-top:20px}
+.section:first-child{border-top:none;padding-top:0}.section:last-child{margin-bottom:0}
+.section-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#8a8377}
+.section-title .hint{font-size:11px;color:var(--faint);font-weight:500;text-transform:none;letter-spacing:0}
+.row{display:flex;gap:8px;align-items:center}.col{display:flex;flex-direction:column;gap:8px}.grow{flex:1}
+.btn{border:1px solid var(--line);border-radius:9px;background:var(--surface);color:var(--text);padding:9px 14px;cursor:pointer;
+  font-size:12.5px;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:7px;transition:.14s ease;white-space:nowrap}
+.btn:hover{background:var(--surface2);border-color:rgba(255,255,255,.14)}.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.btn-primary:hover{filter:brightness(1.08);background:var(--accent)}
+.btn-secondary{background:var(--surface);color:var(--text)}
+.btn-ghost{background:transparent;border-color:transparent;color:var(--muted)}.btn-ghost:hover{background:var(--surface)}
+.btn-danger{background:var(--danger-soft);border-color:rgba(226,102,90,.22);color:#f0a49c}
+.btn-sm{padding:6px 10px;border-radius:8px;font-size:11.5px}.btn-icon{width:32px;height:32px;padding:0}.full{width:100%}
+input[type=file]{display:none}.file-zone{display:grid;grid-template-columns:1fr 1fr;gap:8px}.file-label{cursor:pointer}
+.field{display:flex;flex-direction:column;gap:6px}.field label{font-size:11.5px;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+.control,input[type=text],input[type=number],select,textarea{width:100%;border:1px solid var(--line);background:#0c0e13;color:var(--text);border-radius:9px;padding:9px 11px;font-size:13px;outline:none;transition:.14s}
+.control:focus,input[type=text]:focus,input[type=number]:focus,select:focus,textarea:focus{border-color:rgba(91,132,247,.65);box-shadow:0 0 0 3px var(--accent-soft)}
+textarea{min-height:70px;resize:vertical;line-height:1.5}
+input[type=color]{width:36px;height:34px;padding:3px;border:1px solid var(--line);border-radius:8px;background:#0c0e13;cursor:pointer}
+input[type=color]::-webkit-color-swatch-wrapper{padding:2px}input[type=color]::-webkit-color-swatch{border:none;border-radius:5px}input[type=color]::-moz-color-swatch{border:none;border-radius:5px}
+select{appearance:none;-webkit-appearance:none;-moz-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%2396908a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;cursor:pointer}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:16px;background:transparent;cursor:pointer;margin:6px 0}
+input[type=range]::-webkit-slider-runnable-track{height:3px;background:var(--line);border-radius:2px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;margin-top:-5px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px var(--bg)}
+input[type=range]::-moz-range-track{height:3px;background:var(--line);border-radius:2px}
+input[type=range]::-moz-range-thumb{width:13px;height:13px;border:none;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px var(--bg)}
+.divider{height:1px;background:var(--line);margin:11px 0}
+.segment{display:flex;gap:2px;border-bottom:1px solid var(--line);overflow:auto}
+.seg-btn{border:0;background:transparent;color:var(--faint);border-radius:0;padding:8px 4px;margin-right:14px;font-size:12px;font-weight:500;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent}
+.seg-btn.active{color:var(--text);border-bottom-color:var(--accent);font-weight:600}
+.layer-list{display:flex;flex-direction:column;gap:6px}.empty{font-size:12px;color:var(--faint);text-align:center;padding:20px 8px}
+.layer-card{padding:11px;border:1px solid var(--line);border-radius:10px;background:var(--surface);transition:.14s;cursor:pointer}
+.layer-card:hover{border-color:rgba(255,255,255,.16)}.layer-card.active{border-color:rgba(91,132,247,.6);background:var(--accent-soft)}
+.layer-top{display:flex;align-items:center;gap:10px}.layer-icon{width:28px;height:28px;border-radius:8px;background:var(--surface2);display:grid;place-items:center;font-size:12px;flex:0 0 auto;color:var(--muted)}
+.layer-meta{min-width:0;flex:1}.layer-name{font-size:12.5px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.layer-kind{font-size:10.5px;color:var(--faint);margin-top:2px}
+.layer-actions{display:flex;gap:3px}.mini{border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:6px;padding:5px 6px;font-size:10px;cursor:pointer}
+.mini:hover{background:var(--surface2);color:var(--text)}.mini.danger:hover{color:#f0a49c;border-color:rgba(226,102,90,.3)}
+.layer-controls{margin-top:10px;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:end}.layer-controls .wide{grid-column:1/-1}
+.sticker-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;max-height:132px;overflow:auto;padding-right:2px}
+.sticker{aspect-ratio:1;border:1px solid transparent;background:transparent;border-radius:8px;font-size:19px;cursor:pointer;display:grid;place-items:center}
+.sticker:hover{background:var(--surface2);border-color:var(--line)}
+.ascii-list{display:flex;flex-direction:column;gap:4px;max-height:132px;overflow:auto}
+.ascii{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid transparent;background:transparent;border-radius:8px;padding:8px 9px;cursor:pointer}
+.ascii:hover{background:var(--surface2);border-color:var(--line)}.ascii b{font-size:11px;font-weight:500;color:var(--muted)}.ascii code{font-size:12px;color:var(--text);white-space:nowrap}
+.center{min-width:0;height:100%;display:flex;flex-direction:column;gap:14px}
+.workspace-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 2px}
+.ratio-group{display:flex;gap:2px}
+.ratio-btn{border:0;border-bottom:2px solid transparent;background:transparent;color:var(--faint);border-radius:0;padding:9px 12px;font-size:12.5px;font-weight:500;cursor:pointer}
+.ratio-btn.active{color:var(--text);border-bottom-color:var(--accent);font-weight:600}
+.stage{position:relative;flex:1;min-height:0;border:1px solid var(--line);border-radius:var(--radius-lg);overflow:hidden;display:flex;align-items:center;justify-content:center;padding:24px;background-color:#0a0b0f;background-image:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1px);background-size:20px 20px}
+.dropzone{appearance:none;-webkit-appearance:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;border:1px dashed var(--line);border-radius:10px;padding:16px 8px;text-align:center;cursor:pointer;color:var(--muted);font-size:12px;font-weight:500;background:transparent;transition:.14s}
+.dropzone:hover{border-color:rgba(91,132,247,.5);color:var(--text);background:var(--accent-soft)}
+.dropzone .icon{width:18px;height:18px;color:var(--faint)}.dropzone:hover .icon{color:var(--accent)}
+.canvas-shell{position:relative;max-width:100%;max-height:100%;border-radius:6px;overflow:hidden;background:#1b1f29}
+.canvas-shell::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:0 20px 50px rgba(0,0,0,.4),inset 0 0 0 1px rgba(255,255,255,.06)}
+canvas{display:block;max-width:min(100%,760px);max-height:84%;width:auto;height:auto;touch-action:none;cursor:default;background:#20242f}
+.status-chip{font-size:11.5px;color:var(--muted);display:flex;align-items:center}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--success);display:inline-block;margin-right:7px}
+.kbd{border:1px solid var(--line);background:var(--surface2);border-radius:5px;padding:2px 6px;font-size:10px;color:var(--muted)}
+.template-list{display:flex;flex-direction:column;gap:6px}
+.template-item{display:flex;align-items:center;gap:7px;padding:9px 10px;border:1px solid var(--line);background:var(--surface);border-radius:9px}
+.template-item strong{font-size:12px;font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.template-active-row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;font-size:11.5px;color:var(--muted)}
+.template-active-row b{color:var(--text);font-weight:500}
+.notice{padding:12px 13px;border-radius:9px;border:1px solid var(--line);background:var(--surface);font-size:12.5px;color:var(--muted);line-height:1.7}
+.toast{position:fixed;right:20px;bottom:20px;z-index:1000;max-width:330px;padding:11px 14px;border-radius:10px;background:#191d27;border:1px solid var(--line);box-shadow:0 15px 40px rgba(0,0,0,.4);font-size:13px;color:var(--text);opacity:0;transform:translateY(8px);pointer-events:none;transition:.2s}
+.toast.show{opacity:1;transform:translateY(0)}
+.pill{display:inline-flex;align-items:center;gap:4px;border-radius:999px;padding:2px 7px;background:var(--surface2);color:var(--muted);font-size:10.5px;font-weight:600}
+.canvas-editor{position:absolute;display:none;z-index:20;min-width:120px;min-height:44px;padding:10px 12px;border-radius:10px;border:2px solid var(--accent);background:rgba(12,11,9,.96);color:var(--text);outline:none;resize:none;line-height:1.45;box-shadow:0 14px 32px rgba(0,0,0,.4);caret-color:var(--accent)}
+.canvas-editor::placeholder{color:var(--faint)}
+.panel.right .panel-body{display:flex;flex-direction:column;gap:0}.panel.right .section{margin-bottom:0}
+.guide-section{margin-top:auto}.guide-notice{line-height:1.8;font-size:12.5px}
+.guide-notice ul{margin:0;padding-left:16px}.guide-notice li+li{margin-top:8px}
+.icon{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+@media(max-width:1150px){.app-scale-holder{height:auto;overflow:visible;display:block}.app-shell{width:100%;max-width:none;height:auto;padding:10px;display:flex;flex-direction:column;min-height:auto}.panel{height:auto;max-height:none}.center{height:auto}.stage{min-height:440px;padding:20px 10px}canvas{max-height:72vh}.workspace-toolbar{align-items:flex-start;flex-direction:column;gap:6px}.brand small{display:none}.header-actions .hide-sm{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="brand-mark">W</div><div><h1>Wonwon <em>Studio</em></h1><small>Layer-based social image editor</small></div></div>
+  <div class="header-actions">
+    <button class="btn btn-icon" onclick="undoState()" title="되돌리기"><svg class="icon" viewBox="0 0 24 24"><path d="M3 10h10a5 5 0 0 1 0 10h-2"/><path d="M8 5 3 10l5 5"/></svg></button>
+    <button class="btn btn-icon" onclick="redoState()" title="다시 실행"><svg class="icon" viewBox="0 0 24 24"><path d="M21 10H11a5 5 0 0 0 0 10h2"/><path d="M16 5l5 5-5 5"/></svg></button>
+    <button class="btn btn-sm" onclick="saveTemplatePrompt()"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3l2.6 5.6 6 .8-4.4 4.2 1.1 6-5.3-3-5.3 3 1.1-6L3.4 9.4l6-.8z"/></svg><span class="hide-sm">템플릿 저장</span></button>
+    <button class="btn btn-sm" onclick="exportJSON()"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 19h16"/></svg><span class="hide-sm">JSON 내보내기</span></button>
+    <label class="btn btn-sm file-label"><svg class="icon" viewBox="0 0 24 24"><path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M4 19h16"/></svg><span class="hide-sm">JSON 가져오기</span><input type="file" id="json-input-header" accept=".json,application/json" onchange="importJSON(event)"></label>
+    <button class="btn btn-primary btn-sm" onclick="downloadImage()"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 19h16"/></svg>PNG 저장</button>
+  </div>
+</header>
+
+<div class="app-scale-holder">
+<div class="app-shell">
+  <aside class="panel left">
+    <div class="panel-head"><div class="panel-title">레이어 & 에셋</div><div class="panel-sub">배경, 사진, 문구, 스티커를 하나의 캔버스에서 관리합니다.</div></div>
+    <div class="panel-body">
+      <div class="section">
+        <div class="section-title"><span>배경</span><span class="hint" id="bg-scale-label">100%</span></div>
+        <div class="file-zone">
+          <label class="dropzone file-label"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="1.5"/><path d="m21 15-5-5-9 9"/></svg>배경 불러오기<input type="file" id="bg-input" accept="image/png,image/jpeg,image/webp" onchange="handleBackgroundUpload(event)"></label>
+          <button class="btn btn-danger btn-sm" onclick="removeBackground()" style="align-self:stretch">배경 제거</button>
+        </div>
+        <div class="field" style="margin-top:9px"><label><span>배경 확대</span><span>더블클릭으로도 변경</span></label><input id="bg-scale" type="range" min="100" max="260" value="100" oninput="setBackgroundScale(this.value)"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title"><span>추가하기</span></div>
+        <div class="file-zone">
+          <label class="dropzone file-label"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="9" cy="9" r="1.5"/><path d="m21 15-5-5-9 9"/></svg>사진 추가<input type="file" id="layer-image-input" accept="image/png,image/jpeg,image/webp" multiple onchange="handleLayerImageUpload(event)"></label>
+          <button class="dropzone" onclick="addTextLayer()" style="border-style:solid;color:var(--text)"><svg class="icon" viewBox="0 0 24 24"><path d="M5 5h14"/><path d="M12 5v14"/><path d="M9 19h6"/></svg>문구 추가</button>
+        </div>
+        <div class="notice" style="margin-top:8px">사진을 더블클릭하면 <b>리사이즈 모드</b>가 켜집니다. 모서리 핸들을 드래그해 크기를 조절할 수 있어요.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-title"><span>레이어 목록 <span id="layer-count" class="pill">1</span></span><span class="hint">위쪽 = 더 앞</span></div>
+        <div id="layer-list" class="layer-list"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title"><span>선택한 레이어</span><span class="hint" id="inspector-kind">없음</span></div>
+        <div id="inspector"><div class="empty">캔버스 또는 레이어 목록에서 대상을 선택해 주세요.</div></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title"><span>저장된 템플릿</span><span class="hint">브라우저에 자동 저장</span></div>
+        <div class="template-active-row"><span>불러온 템플릿: <b id="active-template-name">없음</b></span><button class="mini" onclick="updateLoadedTemplate()">현재 상태로 덮어쓰기</button></div>
+        <div id="template-list" class="template-list"><div class="empty">저장된 템플릿이 없습니다. 상단의 "템플릿 저장"으로 만들어 보세요.</div></div>
+      </div>
+
+    </div>
+  </aside>
+
+  <main class="center">
+    <div class="workspace-toolbar">
+      <div class="ratio-group">
+        <button class="ratio-btn active" data-ratio="1:1" onclick="setRatio(this,'1:1',600,600)">1:1 정사각</button>
+        <button class="ratio-btn" data-ratio="4:5" onclick="setRatio(this,'4:5',600,750)">4:5 피드</button>
+        <button class="ratio-btn" data-ratio="9:16" onclick="setRatio(this,'9:16',540,960)">9:16 스토리</button>
+        <button class="ratio-btn" data-ratio="16:9" onclick="setRatio(this,'16:9',960,540)">16:9 와이드</button>
+      </div>
+      <div class="row"><span class="status-chip"><i class="dot"></i><span id="selection-status">레이어 선택 가능</span></span></div>
+    </div>
+    <div class="stage">
+      <div class="canvas-shell"><canvas id="cardCanvas" width="600" height="600" tabindex="0"></canvas><textarea id="canvas-editor" class="canvas-editor" spellcheck="false"></textarea></div>
+    </div>
+  </main>
+
+
+  <aside class="panel right">
+    <div class="panel-head"><div class="panel-title">스티커</div><div class="panel-sub">이모지와 카오모지를 바로 추가할 수 있습니다.</div></div>
+    <div class="panel-body">
+      <div class="section">
+        <div class="section-title"><span>이모지 스티커</span></div>
+        <div id="emoji-tabs" class="segment" style="margin-bottom:8px"></div>
+        <div id="emoji-grid" class="sticker-grid"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title"><span>카오모지</span></div>
+        <div id="ascii-tabs" class="segment" style="margin-bottom:8px"></div>
+        <div id="ascii-list" class="ascii-list"></div>
+      </div>
+
+      <div class="section guide-section">
+        <div class="section-title"><span>조작 안내</span></div>
+        <div class="notice guide-notice">
+          <ul>
+            <li><b>드래그</b>하면 레이어를 이동할 수 있어요.</li>
+            <li><b>더블클릭</b>하면 문구·이모지·사진 크기를 조절할 수 있어요.</li>
+            <li>내용 수정은 왼쪽의 <b>선택한 레이어</b>에서 할 수 있어요.</li>
+            <li><span class="kbd">Delete</span> 삭제 · <span class="kbd">Esc</span> 선택 해제</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </aside>
+</div>
+</div>
+<div id="toast" class="toast"></div>
+<script>
+const canvas=document.getElementById('cardCanvas');
+const ctx=canvas.getContext('2d');
+let canvasWidth=600,canvasHeight=600;
+let background={src:'',x:0,y:0,scale:1};
+let backgroundImage=new Image();
+let imageCache=new Map();
+let layers=[{id:1,type:'text',kind:'text',name:'문구 1',text:'여기에 문구를 입력해 주세요',fontSize:34,fontWeight:800,color:'#ffffff',effect:'shadow',strokeColor:'#000000',strokeWidth:4,x:300,y:490,opacity:1}];
+let activeLayerId=1;
+let resizeMode=false;
+let interaction=null;
+let history=[],historyIndex=-1,isRestoring=false;
+let loadedTemplateId=null;
+let templates=safeParse(localStorage.getItem('wonwon_studio_templates_v2'),[]);
+
+const emojiGroups={
+ '표정':['😀','😃','😄','😁','😆','😂','🤣','🥹','😊','🙂','🙃','😉','😍','🥰','😘','😎','🤓','🧐','🤔','🫠','😴','😭','🥲','😤','😡','🤯','🥳','🤩','😇','🫶','👏','🙌','👍','👀','💅','✨','🔥','💯','⭐','🌟'],
+ '동물':['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐻‍❄️','🐨','🐯','🦁','🐮','🐷','🐸','🐵','🐧','🐦','🐤','🦄','🐝','🦋','🐌','🐞','🐟','🐬','🐳','🦭','🐙','🦀','🐢','🦖'],
+ '자연':['🌸','🌷','🌹','🌺','🌻','🌼','🍀','🌿','🌱','🌵','🌴','🌲','🍂','🍁','☀️','🌤️','☁️','🌧️','⛈️','❄️','☔','💧','🌊','🌈','🌙','🌕','🌌','⚡','🔥','✨','⭐','☄️'],
+ '음식':['🍓','🍒','🍎','🍊','🍋','🍑','🍇','🍉','🥐','🥯','🍞','🥞','🧇','🍔','🍟','🍕','🌭','🍝','🍜','🍙','🍣','🍤','🍰','🧁','🍪','🍫','🍿','☕','🧋','🥤','🍺','🍻'],
+ '사물':['🎁','🎈','🎉','🎊','🎀','🧸','🎨','🖍️','📷','🎧','🎮','💻','⌨️','📱','💡','📌','📎','✏️','📚','💰','💎','🏆','🥇','🎟️','🛒','🪄','🔮','⏰','🕯️','🪩','🧩','🎲'],
+ '하트':['❤️','🩷','🧡','💛','💚','🩵','💙','💜','🤎','🖤','🩶','🤍','💖','💗','💓','💞','💕','💘','💝','💟','❣️','💔','❤️‍🔥','❤️‍🩹','💌','💋','🫶','💫','💥','💬','💭','❕']
+};
+const asciiGroups={
+ '귀여움':[
+  ['기본 미소','(｡•̀ᴗ-)✧'],['활짝','(๑>◡<๑)'],['반짝','(✧∀✧)'],['수줍','(⁄ ⁄•⁄ω⁄•⁄ ⁄)'],['헤헤','(˶ᵔ ᵕ ᵔ˶)'],['뿌듯','( •̀ᴗ•́ )و'],['냠냠','(っ˘ڡ˘ς)'],['콕','(σ≧▽≦)σ'],['두근','(♡˙︶˙♡)'],['행복','ヽ(>∀<☆)ノ'],['멍','(・_・;)'],['힝','(｡•́︿•̀｡)']
+ ],
+ '동물':[
+  ['고양이','(=^･ω･^=)'],['냥냥','ฅ^•ﻌ•^ฅ'],['곰','ʕ•ᴥ•ʔ'],['토끼','／(≧ x ≦)＼'],['강아지','U・ᴥ・U'],['여우','ᏊˊꈊˋᏊ'],['병아리','(•ө•)♡'],['문어','Ｃ:。ミ'],['물고기','<°)))彡'],['쥐','<:3 )~~'],['새','(•ㅅ•)'],['고양이2','(^._.^)ﾉ']
+ ],
+ '인사':[
+  ['안녕','ヾ(＾-＾)ノ'],['만세','\\(^_^)/'],['파이팅','(ง •̀_•́)ง'],['성공','(๑˃̵ᴗ˂̵)و'],['꾸벅','m(_ _)m'],['차 한잔','(っ˘-˘)づ旦'],['손흔들기','( ´ ▽ ` )ﾉ'],['박수','(*＾▽＾)／'],['최고','d(>_< )'],['오케이','(•̀ᴗ•́)و ̑̑'],['감사','(人 •͈ᴗ•͈)'],['수고','(っ´▽`)っ']
+ ],
+ '하트':[
+  ['하트눈','(｡♥‿♥｡)'],['포옹','(づ￣ ³￣)づ'],['키스','( ˘ ³˘)♥'],['러브','♡( ◡‿◡ )'],['두근두근','(♡°▽°♡)'],['좋아','(´｡• ᵕ •｡`) ♡'],['꽃하트','(✿ ♥‿♥)'],['사랑해','(っ˘з(˘⌣˘ )'],['쪽','(づ｡◕‿‿◕｡)づ'],['별하트','★~(◡﹏◕✿)'],['하트빔','(ﾉ´ з `)ノ♡'],['마음','♡ ～(˘▽˘)~ ♡']
+ ],
+ '리액션':[
+  ['선글라스','(⌐■_■)'],['어쩔','¯\\_(ツ)_/¯'],['책상 뒤엎기','(╯°□°）╯︵ ┻━┻'],['책상 복구','┬─┬ ノ( ゜-゜ノ)'],['충격','(⊙_⊙;)'],['눈치','(¬_¬)'],['당황','Σ(°△°|||)'],['졸림','(-_-) zzz'],['울음','ಥ_ಥ'],['분노','(ノಠ益ಠ)ノ'],['도망','ε=ε=ε=┌(;*´Д`)ﾉ'],['감동','o((*^▽^*))o']
+ ]
+};
+let currentEmojiGroup=Object.keys(emojiGroups)[0],currentAsciiGroup=Object.keys(asciiGroups)[0];
+const canvasShell=document.querySelector('.canvas-shell');
+const canvasEditor=document.getElementById('canvas-editor');
+let editingLayerId=null;
+let editingOriginalText='';
+
+function safeParse(v,f){try{return v?JSON.parse(v):f}catch{return f}}
+function uid(){return Date.now()+Math.floor(Math.random()*100000)}
+function cloneData(v){return JSON.parse(JSON.stringify(v))}
+function serializeState(){return{canvasWidth,canvasHeight,background:cloneData(background),layers:cloneData(layers)}}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(showToast.timer);showToast.timer=setTimeout(()=>t.classList.remove('show'),2200)}
+function saveState(){if(isRestoring)return;const s=serializeState();history=history.slice(0,historyIndex+1);history.push(s);if(history.length>50)history.shift();historyIndex=history.length-1;updateUI()}
+function restoreState(s){if(!s)return;isRestoring=true;canvasWidth=s.canvasWidth;canvasHeight=s.canvasHeight;canvas.width=canvasWidth;canvas.height=canvasHeight;background=cloneData(s.background||{src:'',x:0,y:0,scale:1});layers=cloneData(s.layers||[]);if(activeLayerId&&!layers.some(l=>l.id===activeLayerId))activeLayerId=layers.at(-1)?.id??null;preloadAllImages(()=>{isRestoring=false;updateUI();redrawCanvas()})}
+function undoState(){if(historyIndex<=0){showToast('더 이전 단계가 없습니다.');return}historyIndex--;restoreState(history[historyIndex])}
+function redoState(){if(historyIndex>=history.length-1){showToast('다시 실행할 단계가 없습니다.');return}historyIndex++;restoreState(history[historyIndex])}
+
+function getImage(src){if(!src)return null;if(imageCache.has(src))return imageCache.get(src);const img=new Image();img.src=src;imageCache.set(src,img);img.onload=redrawCanvas;return img}
+function preloadAllImages(done){let srcs=[background.src,...layers.filter(l=>l.type==='image').map(l=>l.src)].filter(Boolean);if(!srcs.length){done?.();return}let left=srcs.length;srcs.forEach(src=>{const img=getImage(src);if(img.complete){if(--left===0)done?.()}else{const fin=()=>{if(--left===0)done?.()};img.addEventListener('load',fin,{once:true});img.addEventListener('error',fin,{once:true})}})}
+
+function drawRoundedImage(img,x,y,w,h,r){ctx.save();if(r>0){const rr=Math.min(r,w/2,h/2);ctx.beginPath();ctx.roundRect(x,y,w,h,rr);ctx.clip()}ctx.drawImage(img,x,y,w,h);ctx.restore()}
+function drawBackground(){if(background.src){const img=getImage(background.src);if(img&&img.complete&&img.naturalWidth){const imgRatio=img.naturalWidth/img.naturalHeight,canvasRatio=canvasWidth/canvasHeight;let w,h;if(imgRatio>canvasRatio){h=canvasHeight*background.scale;w=h*imgRatio}else{w=canvasWidth*background.scale;h=w/imgRatio}ctx.drawImage(img,(canvasWidth-w)/2+background.x,(canvasHeight-h)/2+background.y,w,h);return}}ctx.fillStyle='#1b1f29';ctx.fillRect(0,0,canvasWidth,canvasHeight);ctx.save();ctx.strokeStyle='rgba(91,132,247,.35)';ctx.lineWidth=1.5;ctx.setLineDash([5,6]);const m=Math.min(canvasWidth,canvasHeight)*.09;ctx.strokeRect(m,m,canvasWidth-2*m,canvasHeight-2*m);ctx.restore();ctx.fillStyle='#6b7180';ctx.font='500 15px Pretendard, sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('배경을 추가하거나 레이어부터 시작해 보세요',canvasWidth/2,canvasHeight/2)}
+function textMetrics(layer){ctx.save();ctx.font=`${layer.fontWeight||700} ${layer.fontSize}px Pretendard, sans-serif`;const lines=(layer.text||'').split('\n');const lh=layer.fontSize*1.25;const width=Math.max(24,...lines.map(x=>ctx.measureText(x||' ').width));ctx.restore();return{width,height:Math.max(lh,lines.length*lh),lines,lineHeight:lh}}
+function drawLayer(layer){ctx.save();ctx.globalAlpha=layer.opacity??1;if(layer.type==='image'){const img=getImage(layer.src);if(img&&img.complete&&img.naturalWidth)drawRoundedImage(img,layer.x-layer.width/2,layer.y-layer.height/2,layer.width,layer.height,layer.radius||0)}else{ctx.font=`${layer.fontWeight||700} ${layer.fontSize}px Pretendard, sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';const m=textMetrics(layer);m.lines.forEach((line,i)=>{const y=layer.y+(i-(m.lines.length-1)/2)*m.lineHeight;if(layer.effect==='shadow'){ctx.shadowColor='rgba(0,0,0,.75)';ctx.shadowBlur=Math.max(5,layer.fontSize*.16);ctx.shadowOffsetX=2;ctx.shadowOffsetY=3;ctx.fillStyle=layer.color;ctx.fillText(line,layer.x,y);ctx.shadowColor='transparent'}else if(layer.effect==='stroke'){ctx.lineJoin='round';ctx.lineWidth=layer.strokeWidth||4;ctx.strokeStyle=layer.strokeColor||'#000';ctx.strokeText(line,layer.x,y);ctx.fillStyle=layer.color;ctx.fillText(line,layer.x,y)}else{ctx.fillStyle=layer.color;ctx.fillText(line,layer.x,y)}})}ctx.restore()}
+function layerBounds(l){if(l.type==='image'){return{x1:l.x-l.width/2,y1:l.y-l.height/2,x2:l.x+l.width/2,y2:l.y+l.height/2,width:l.width,height:l.height}}const m=textMetrics(l);const x1=l.x-m.width/2-10,y1=l.y-m.height/2-8,x2=l.x+m.width/2+10,y2=l.y+m.height/2+8;return{x1,y1,x2,y2,width:x2-x1,height:y2-y1}}
+function drawSelection(){const l=layers.find(x=>x.id===activeLayerId);if(!l)return;const b=layerBounds(l);ctx.save();ctx.strokeStyle='rgba(59,130,246,.95)';ctx.fillStyle='#3b82f6';ctx.lineWidth=Math.max(1,canvasWidth/600);ctx.setLineDash([6,5]);ctx.strokeRect(b.x1,b.y1,b.width,b.height);ctx.setLineDash([]);if(resizeMode){getHandles(l).forEach(h=>{ctx.fillStyle='#f7f7fb';ctx.strokeStyle='#2563eb';ctx.lineWidth=2;ctx.beginPath();ctx.rect(h.x-6,h.y-6,12,12);ctx.fill();ctx.stroke()})}ctx.restore()}
+function redrawCanvas(){ctx.clearRect(0,0,canvasWidth,canvasHeight);ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality='high';drawBackground();layers.forEach(drawLayer);drawSelection()}
+
+function canvasPoint(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*(canvas.width/r.width),y:(e.clientY-r.top)*(canvas.height/r.height)}}
+function hitLayer(p){for(let i=layers.length-1;i>=0;i--){const l=layers[i];const b=layerBounds(l);if(p.x>=b.x1-4&&p.x<=b.x2+4&&p.y>=b.y1-4&&p.y<=b.y2+4)return l}return null}
+function getHandles(l){const b=layerBounds(l);return[{k:'nw',x:b.x1,y:b.y1},{k:'ne',x:b.x2,y:b.y1},{k:'sw',x:b.x1,y:b.y2},{k:'se',x:b.x2,y:b.y2}]}
+function hitHandle(p,l){const threshold=14*(canvas.width/canvas.getBoundingClientRect().width);return getHandles(l).find(h=>Math.abs(p.x-h.x)<=threshold&&Math.abs(p.y-h.y)<=threshold)}
+function oppositeForHandle(l,k){const b=layerBounds(l);return k==='nw'?{x:b.x2,y:b.y2}:k==='ne'?{x:b.x1,y:b.y2}:k==='sw'?{x:b.x2,y:b.y1}:{x:b.x1,y:b.y1}}
+
+function positionInlineEditor(){const l=layers.find(x=>x.id===editingLayerId);if(!l||l.type!=='text'){return}const m=textMetrics(l);const scaleX=canvas.clientWidth/canvas.width;const scaleY=canvas.clientHeight/canvas.height;const pad=8;const left=Math.max(6,(l.x-m.width/2-16)*scaleX);const top=Math.max(6,(l.y-m.height/2-12)*scaleY);const width=Math.min(canvas.clientWidth-left-6,Math.max(160,(m.width+34)*scaleX));const height=Math.min(canvas.clientHeight-top-6,Math.max(48,(m.height+24)*scaleY));canvasEditor.style.left=left+'px';canvasEditor.style.top=top+'px';canvasEditor.style.width=width+'px';canvasEditor.style.height=height+'px';canvasEditor.style.fontSize=Math.max(14,Math.round((l.fontSize||24)*Math.min(scaleX,scaleY)))+'px';canvasEditor.style.fontWeight=String(l.fontWeight||700);canvasEditor.style.color=l.color||'#ffffff';canvasEditor.style.textAlign='center';canvasEditor.style.padding=pad+'px '+(pad+2)+'px';}
+function beginInlineEdit(layer){if(!layer||layer.type!=='text')return;editingLayerId=layer.id;editingOriginalText=layer.text||'';activeLayerId=layer.id;resizeMode=false;canvasEditor.value=layer.text||'';canvasEditor.placeholder='여기에 문구를 입력해 주세요';canvasEditor.style.display='block';positionInlineEditor();redrawCanvas();requestAnimationFrame(()=>{canvasEditor.focus();canvasEditor.setSelectionRange(canvasEditor.value.length,canvasEditor.value.length)})}
+function finishInlineEdit(save=true){if(editingLayerId==null)return;const l=layers.find(x=>x.id===editingLayerId);if(l&&save)l.text=canvasEditor.value;if(l&&!save)l.text=editingOriginalText;canvasEditor.style.display='none';const changed=save&&l&&l.text!==editingOriginalText;editingLayerId=null;editingOriginalText='';if(changed)saveState();else{updateUI();redrawCanvas();}}
+canvasEditor.addEventListener('input',()=>{const l=layers.find(x=>x.id===editingLayerId);if(!l)return;l.text=canvasEditor.value;positionInlineEditor();redrawCanvas();renderLayerList();renderInspector();updateSelectionStatus()});
+canvasEditor.addEventListener('blur',()=>finishInlineEdit(true));
+canvasEditor.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();finishInlineEdit(false)}if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){e.preventDefault();canvasEditor.blur()}});
+window.addEventListener('resize',()=>{if(editingLayerId!=null)positionInlineEditor()});
+
+canvas.addEventListener('mousedown',e=>{if(e.button!==0)return;if(editingLayerId!=null&&e.target!==canvasEditor)finishInlineEdit(true);const p=canvasPoint(e);const active=layers.find(x=>x.id===activeLayerId);if(resizeMode&&active){const h=hitHandle(p,active);if(h){const b=layerBounds(active);interaction={type:'resize',id:active.id,handle:h.k,opposite:oppositeForHandle(active,h.k),ratio:active.type==='image'?active.width/active.height:(b.width/b.height),startWidth:b.width,startHeight:b.height,startFontSize:active.fontSize||24};return}}
+ const hit=hitLayer(p);if(hit){activeLayerId=hit.id;resizeMode=false;interaction={type:'move',id:hit.id,dx:p.x-hit.x,dy:p.y-hit.y};updateUI();redrawCanvas()}else{activeLayerId=null;resizeMode=false;interaction={type:'background',start:p,bx:background.x,by:background.y};updateUI();redrawCanvas()}});
+window.addEventListener('mousemove',e=>{if(!interaction)return;const p=canvasPoint(e);if(interaction.type==='move'){const l=layers.find(x=>x.id===interaction.id);if(!l)return;l.x=Math.max(0,Math.min(canvasWidth,p.x-interaction.dx));l.y=Math.max(0,Math.min(canvasHeight,p.y-interaction.dy));redrawCanvas()}else if(interaction.type==='background'&&background.src){background.x=interaction.bx+(p.x-interaction.start.x);background.y=interaction.by+(p.y-interaction.start.y);clampBackground();redrawCanvas()}else if(interaction.type==='resize'){const l=layers.find(x=>x.id===interaction.id);if(!l)return;const o=interaction.opposite;const signX=interaction.handle.includes('e')?1:-1,signY=interaction.handle.includes('s')?1:-1;if(l.type==='image'){let w=Math.max(28,Math.abs(p.x-o.x));let h=w/interaction.ratio;if(h<28){h=28;w=h*interaction.ratio}l.x=o.x+signX*w/2;l.y=o.y+signY*h/2;l.width=w;l.height=h}else{const rawW=Math.max(24,Math.abs(p.x-o.x));const rawH=Math.max(24,Math.abs(p.y-o.y));const scale=Math.max(rawW/interaction.startWidth,rawH/interaction.startHeight);l.fontSize=Math.max(10,Math.round(interaction.startFontSize*scale));const b=layerBounds(l);l.x=o.x+signX*b.width/2;l.y=o.y+signY*b.height/2;}redrawCanvas()}});
+window.addEventListener('mouseup',()=>{if(interaction){saveState();interaction=null}});
+canvas.addEventListener('dblclick',e=>{const p=canvasPoint(e);const hit=hitLayer(p);if(hit){finishInlineEdit(true);activeLayerId=hit.id;resizeMode=true;const label=hit.type==='image'?'사진':(hit.kind==='emoji'?'이모지':hit.kind==='ascii'?'아스키':'문구');showToast(`${label} 리사이즈 모드: 모서리 핸들을 드래그하세요.`);updateUI();redrawCanvas();return}finishInlineEdit(true);if(background.src){background.scale=background.scale>=2.2?1:Math.min(2.6,background.scale+.25);document.getElementById('bg-scale').value=Math.round(background.scale*100);clampBackground();saveState();showToast(`배경 확대 ${Math.round(background.scale*100)}%`)}});
+window.addEventListener('keydown',e=>{if(document.activeElement===canvasEditor){if(e.key==='Escape'){e.preventDefault();finishInlineEdit(false)}return}if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName))return;if((e.key==='Delete'||e.key==='Backspace')&&activeLayerId){deleteLayer(activeLayerId);e.preventDefault()}if(e.key==='Escape'){activeLayerId=null;resizeMode=false;updateUI();redrawCanvas()}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?redoState():undoState()}});
+
+function clampBackground(){if(!background.src)return;const img=getImage(background.src);if(!img?.naturalWidth)return;const ir=img.naturalWidth/img.naturalHeight,cr=canvasWidth/canvasHeight;let w,h;if(ir>cr){h=canvasHeight*background.scale;w=h*ir}else{w=canvasWidth*background.scale;h=w/ir}const mx=Math.max(0,(w-canvasWidth)/2),my=Math.max(0,(h-canvasHeight)/2);background.x=Math.max(-mx,Math.min(mx,background.x));background.y=Math.max(-my,Math.min(my,background.y))}
+function setBackgroundScale(v){background.scale=Number(v)/100;clampBackground();document.getElementById('bg-scale-label').textContent=v+'%';redrawCanvas();clearTimeout(setBackgroundScale.t);setBackgroundScale.t=setTimeout(saveState,180)}
+const ACCEPTED_IMAGE_TYPES=['image/png','image/jpeg','image/webp'];
+function rejectUnsupportedFile(f){if(ACCEPTED_IMAGE_TYPES.includes(f.type))return false;showToast(`지원하지 않는 파일 형식입니다 (${f.type||'알 수 없음'}). PNG 또는 JPEG 파일만 불러올 수 있어요.`);return true}
+function handleBackgroundUpload(e){const f=e.target.files?.[0];if(!f)return;if(rejectUnsupportedFile(f)){e.target.value='';return}readFileAsDataURL(f).then(src=>{background={src,x:0,y:0,scale:1};backgroundImage=getImage(src);document.getElementById('bg-scale').value=100;saveState();preloadAllImages(redrawCanvas);showToast('배경 이미지를 불러왔습니다.')});e.target.value=''}
+function removeBackground(){background={src:'',x:0,y:0,scale:1};document.getElementById('bg-input').value='';document.getElementById('bg-scale').value=100;saveState();redrawCanvas()}
+function readFileAsDataURL(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file)})}
+async function handleLayerImageUpload(e){const allFiles=[...(e.target.files||[])];const files=allFiles.filter(f=>!rejectUnsupportedFile(f));if(!files.length){e.target.value='';return}for(const f of files){const src=await readFileAsDataURL(f);const img=await ensureLoaded(src);const maxW=canvasWidth*.48,maxH=canvasHeight*.48,ratio=img.naturalWidth/img.naturalHeight;let w=maxW,h=w/ratio;if(h>maxH){h=maxH;w=h*ratio}const l={id:uid(),type:'image',kind:'image',name:f.name.replace(/\.[^.]+$/,''),src,x:canvasWidth/2,y:canvasHeight/2,width:w,height:h,opacity:1,radius:0};layers.push(l);activeLayerId=l.id}resizeMode=false;saveState();e.target.value='';showToast(`${files.length}개 사진 레이어를 추가했습니다.`)}
+function ensureLoaded(src){return new Promise((res,rej)=>{const img=getImage(src);if(img.complete&&img.naturalWidth)return res(img);img.onload=()=>res(img);img.onerror=rej})}
+function addTextLayer(){const n=layers.filter(l=>l.type==='text'&&l.kind==='text').length+1;const l={id:uid(),type:'text',kind:'text',name:`문구 ${n}`,text:'새로운 문구',fontSize:32,fontWeight:800,color:'#ffffff',effect:'shadow',strokeColor:'#000000',strokeWidth:4,x:canvasWidth/2,y:canvasHeight/2,opacity:1};layers.push(l);activeLayerId=l.id;resizeMode=false;saveState()}
+function addSticker(symbol,ascii=false){const l={id:uid(),type:'text',kind:ascii?'ascii':'emoji',name:ascii?'아스키 스티커':'이모지 스티커',text:symbol,fontSize:ascii?28:44,fontWeight:ascii?700:600,color:'#ffffff',effect:ascii?'shadow':'none',strokeColor:'#000000',strokeWidth:3,x:canvasWidth/2,y:canvasHeight/2,opacity:1};layers.push(l);activeLayerId=l.id;resizeMode=false;saveState()}
+function deleteLayer(id){layers=layers.filter(l=>l.id!==id);if(activeLayerId===id)activeLayerId=layers.at(-1)?.id??null;resizeMode=false;saveState()}
+function reorder(id,mode){const i=layers.findIndex(l=>l.id===id);if(i<0)return;const [l]=layers.splice(i,1);if(mode==='front')layers.push(l);if(mode==='back')layers.unshift(l);if(mode==='up')layers.splice(Math.min(layers.length,i+1),0,l);if(mode==='down')layers.splice(Math.max(0,i-1),0,l);activeLayerId=id;saveState()}
+function updateLayer(id,prop,val,commit=true){const l=layers.find(x=>x.id===id);if(!l)return;if(['fontSize','fontWeight','strokeWidth','radius'].includes(prop))val=Number(val);if(prop==='opacity')val=Number(val)/100;if(prop==='sizePct'&&l.type==='image'){const current=Math.max(l.width,l.height),target=Math.max(30,Math.min(canvasWidth,canvasHeight)*Number(val)/100),factor=target/current;l.width*=factor;l.height*=factor}else l[prop]=val;redrawCanvas();updateSelectionStatus();if(commit){clearTimeout(updateLayer.t);updateLayer.t=setTimeout(saveState,500)}}
+function duplicateLayer(id){const l=layers.find(x=>x.id===id);if(!l)return;const c=cloneData(l);c.id=uid();c.name=(c.name||'레이어')+' 복사';c.x+=18;c.y+=18;layers.push(c);activeLayerId=c.id;saveState()}
+
+function renderLayerList(){const el=document.getElementById('layer-list');document.getElementById('layer-count').textContent=layers.length;if(!layers.length){el.innerHTML='<div class="empty">아직 레이어가 없습니다.</div>';return}el.innerHTML='';[...layers].reverse().forEach(l=>{const card=document.createElement('div');card.className='layer-card '+(l.id===activeLayerId?'active':'');card.onclick=()=>{activeLayerId=l.id;resizeMode=false;updateUI();redrawCanvas()};const icon=l.type==='image'?'▣':l.kind==='emoji'?'☺':l.kind==='ascii'?'⌁':'T';const kind=l.type==='image'?'사진 레이어':l.kind==='emoji'?'이모지 스티커':l.kind==='ascii'?'아스키 스티커':'문구';const short=l.type==='text'?(l.text||'').replace(/\n/g,' ').slice(0,26):l.name;card.innerHTML=`<div class="layer-top"><div class="layer-icon">${icon}</div><div class="layer-meta"><div class="layer-name">${escapeHtml(short||kind)}</div><div class="layer-kind">${kind}</div></div><div class="layer-actions"><button class="mini" title="맨앞" onclick="event.stopPropagation();reorder(${l.id},'front')">⇈</button><button class="mini" title="앞으로" onclick="event.stopPropagation();reorder(${l.id},'up')">↑</button><button class="mini" title="뒤로" onclick="event.stopPropagation();reorder(${l.id},'down')">↓</button><button class="mini" title="맨뒤" onclick="event.stopPropagation();reorder(${l.id},'back')">⇊</button><button class="mini danger" title="삭제" onclick="event.stopPropagation();deleteLayer(${l.id})">×</button></div></div>${layerCardControls(l)}`;el.appendChild(card)})}
+function layerCardControls(l){if(l.type==='image'){const size=Math.round(Math.max(l.width,l.height)/Math.min(canvasWidth,canvasHeight)*100);return `<div class="layer-controls"><div class="field"><label>크기 <span>${size}%</span></label><input type="range" min="8" max="100" value="${size}" oninput="event.stopPropagation();updateLayer(${l.id},'sizePct',this.value)" onclick="event.stopPropagation()"></div><button class="mini" onclick="event.stopPropagation();activeLayerId=${l.id};resizeMode=true;updateUI();redrawCanvas()">모서리 조절</button><div class="field wide"><label>투명도 <span>${Math.round((l.opacity??1)*100)}%</span></label><input type="range" min="5" max="100" value="${Math.round((l.opacity??1)*100)}" oninput="event.stopPropagation();updateLayer(${l.id},'opacity',this.value)" onclick="event.stopPropagation()"></div></div>`}
+ return `<div class="layer-controls"><div class="field wide"><label>크기 <span>${l.fontSize}px</span></label><input type="range" min="12" max="120" value="${l.fontSize}" oninput="event.stopPropagation();updateLayer(${l.id},'fontSize',this.value)" onclick="event.stopPropagation()"></div></div>`}
+function renderInspector(){const box=document.getElementById('inspector'),kind=document.getElementById('inspector-kind'),l=layers.find(x=>x.id===activeLayerId);if(!l){kind.textContent='없음';box.innerHTML='<div class="empty">캔버스 또는 레이어 목록에서 대상을 선택해 주세요.</div>';return}kind.textContent=l.type==='image'?'사진':l.kind==='emoji'?'이모지':l.kind==='ascii'?'아스키':'문구';if(l.type==='image'){const size=Math.round(Math.max(l.width,l.height)/Math.min(canvasWidth,canvasHeight)*100);box.innerHTML=`<div class="col"><div class="field"><label>레이어 이름</label><input type="text" value="${escapeAttr(l.name||'사진')}" onchange="updateLayer(${l.id},'name',this.value)"></div><div class="field"><label>크기 <span>${size}%</span></label><input type="range" min="8" max="100" value="${size}" oninput="updateLayer(${l.id},'sizePct',this.value)"></div><div class="field"><label>투명도 <span>${Math.round((l.opacity??1)*100)}%</span></label><input type="range" min="5" max="100" value="${Math.round((l.opacity??1)*100)}" oninput="updateLayer(${l.id},'opacity',this.value)"></div><div class="field"><label>모서리 둥글기 <span>${l.radius||0}px</span></label><input type="range" min="0" max="80" value="${l.radius||0}" oninput="updateLayer(${l.id},'radius',this.value)"></div><div class="row"><button class="btn btn-secondary btn-sm grow" onclick="resizeMode=true;updateUI();redrawCanvas()">모서리 리사이즈</button><button class="btn btn-secondary btn-sm" onclick="duplicateLayer(${l.id})">복제</button><button class="btn btn-danger btn-sm" onclick="deleteLayer(${l.id})">삭제</button></div></div>`}else{box.innerHTML=`<div class="col"><div class="field"><label>내용</label><textarea oninput="updateLayer(${l.id},'text',this.value)">${escapeHtml(l.text||'')}</textarea></div><div class="row"><div class="field grow"><label>크기</label><input type="number" min="8" max="160" value="${l.fontSize}" onchange="updateLayer(${l.id},'fontSize',this.value)"></div><div class="field" style="width:48px"><label>색상</label><input type="color" value="${l.color}" onchange="updateLayer(${l.id},'color',this.value)"></div></div><div class="row"><div class="field grow"><label>굵기</label><select onchange="updateLayer(${l.id},'fontWeight',this.value)"><option value="500" ${l.fontWeight==500?'selected':''}>Medium</option><option value="600" ${l.fontWeight==600?'selected':''}>Semi</option><option value="700" ${l.fontWeight==700?'selected':''}>Bold</option><option value="800" ${l.fontWeight==800?'selected':''}>Extra Bold</option></select></div><div class="field grow"><label>효과</label><select onchange="updateLayer(${l.id},'effect',this.value)"><option value="none" ${l.effect==='none'?'selected':''}>없음</option><option value="shadow" ${l.effect==='shadow'?'selected':''}>그림자</option><option value="stroke" ${l.effect==='stroke'?'selected':''}>외곽선</option></select></div></div>${l.effect==='stroke'?`<div class="row"><div class="field grow"><label>외곽선 두께</label><input type="range" min="1" max="16" value="${l.strokeWidth||4}" oninput="updateLayer(${l.id},'strokeWidth',this.value)"></div><div class="field" style="width:48px"><label>선 색상</label><input type="color" value="${l.strokeColor||'#000000'}" onchange="updateLayer(${l.id},'strokeColor',this.value)"></div></div>`:''}<div class="field"><label>투명도 <span>${Math.round((l.opacity??1)*100)}%</span></label><input type="range" min="5" max="100" value="${Math.round((l.opacity??1)*100)}" oninput="updateLayer(${l.id},'opacity',this.value)"></div><div class="row"><button class="btn btn-secondary btn-sm grow" onclick="duplicateLayer(${l.id})">복제</button><button class="btn btn-danger btn-sm" onclick="deleteLayer(${l.id})">삭제</button></div></div>`}}
+function updateInspectorOnly(){renderInspector();renderLayerList();updateSelectionStatus()}
+function updateSelectionStatus(){const s=document.getElementById('selection-status'),l=layers.find(x=>x.id===activeLayerId);if(!l){s.textContent='레이어 선택 가능';return}if(editingLayerId){s.textContent='문구 인라인 편집 중';return}if(resizeMode){const label=l.type==='image'?'사진':(l.kind==='emoji'?'이모지':l.kind==='ascii'?'아스키':'문구');s.textContent=`${label} 리사이즈 모드`;return}s.textContent=`${l.type==='image'?'사진':'텍스트'} 레이어 선택됨`}
+function updateUI(){document.getElementById('bg-scale-label').textContent=Math.round(background.scale*100)+'%';document.getElementById('bg-scale').value=Math.round(background.scale*100);renderLayerList();renderInspector();renderTemplateList();updateSelectionStatus();if(editingLayerId!=null)positionInlineEditor()}
+function escapeHtml(s){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]))}
+function escapeAttr(s){return escapeHtml(s)}
+
+function renderEmojiUI(){const tabs=document.getElementById('emoji-tabs');tabs.innerHTML='';Object.keys(emojiGroups).forEach(k=>{const b=document.createElement('button');b.className='seg-btn '+(k===currentEmojiGroup?'active':'');b.textContent=k;b.onclick=()=>{currentEmojiGroup=k;renderEmojiUI()};tabs.appendChild(b)});const grid=document.getElementById('emoji-grid');grid.innerHTML='';emojiGroups[currentEmojiGroup].forEach(x=>{const b=document.createElement('button');b.className='sticker';b.textContent=x;b.title='클릭하여 스티커 추가';b.onclick=()=>addSticker(x,false);grid.appendChild(b)})}
+function renderAsciiUI(){const tabs=document.getElementById('ascii-tabs');tabs.innerHTML='';Object.keys(asciiGroups).forEach(k=>{const b=document.createElement('button');b.className='seg-btn '+(k===currentAsciiGroup?'active':'');b.textContent=k;b.onclick=()=>{currentAsciiGroup=k;renderAsciiUI()};tabs.appendChild(b)});const list=document.getElementById('ascii-list');list.innerHTML='';asciiGroups[currentAsciiGroup].forEach(([name,symbol])=>{const d=document.createElement('button');d.className='ascii';d.innerHTML=`<b>${escapeHtml(name)}</b><code>${escapeHtml(symbol)}</code>`;d.onclick=()=>addSticker(symbol,true);list.appendChild(d)})}
+
+function setRatio(btn,ratio,w,h){const sx=w/canvasWidth,sy=h/canvasHeight;layers.forEach(l=>{l.x*=sx;l.y*=sy;if(l.type==='image'){l.width*=Math.min(sx,sy);l.height*=Math.min(sx,sy)}else l.fontSize=Math.max(10,Math.round(l.fontSize*Math.min(sx,sy)))});canvasWidth=w;canvasHeight=h;canvas.width=w;canvas.height=h;background.x*=sx;background.y*=sy;document.querySelectorAll('.ratio-btn').forEach(b=>b.classList.toggle('active',b===btn));clampBackground();saveState();redrawCanvas();showToast(`${ratio} 캔버스로 변경했습니다.`)}
+
+function saveTemplate(name){const templateName=(name||'').trim();if(!templateName){showToast('템플릿 이름을 입력해 주세요.');return}const t={id:uid(),name:templateName,createdAt:new Date().toISOString(),state:serializeState()};templates.push(t);try{localStorage.setItem('wonwon_studio_templates_v2',JSON.stringify(templates));renderTemplateList();showToast('템플릿을 저장했습니다.')}catch(err){templates.pop();showToast('브라우저 저장 공간이 부족합니다. JSON 내보내기를 이용해 주세요.')}}
+function saveTemplatePrompt(){const name=prompt('템플릿 이름을 입력해 주세요:','새 템플릿');if(name!==null)saveTemplate(name)}
+function renderTemplateList(){const el=document.getElementById('template-list');const nameEl=document.getElementById('active-template-name');if(nameEl){const active=templates.find(t=>t.id===loadedTemplateId);nameEl.textContent=active?active.name:'없음'}if(!el)return;if(!templates.length){el.innerHTML='<div class="empty">저장된 템플릿이 없습니다. 상단의 "템플릿 저장"으로 만들어 보세요.</div>';return}el.innerHTML='';[...templates].reverse().forEach(t=>{const d=document.createElement('div');d.className='template-item';if(t.id===loadedTemplateId)d.style.borderColor='rgba(91,132,247,.5)';d.innerHTML=`<strong>${escapeHtml(t.name)}</strong><button class="mini" onclick="loadTemplate(${t.id})">불러오기</button><button class="mini danger" onclick="deleteTemplate(${t.id})">삭제</button>`;el.appendChild(d)})}
+function loadTemplate(id){const t=templates.find(x=>x.id===id);if(!t)return;activeLayerId=null;resizeMode=false;loadedTemplateId=id;restoreState(cloneData(t.state));setTimeout(()=>{saveState();renderTemplateList();showToast(`“${t.name}” 템플릿을 불러왔습니다.`)},0)}
+function updateLoadedTemplate(){if(!loadedTemplateId){showToast('먼저 템플릿을 불러온 뒤 덮어쓸 수 있어요.');return}const t=templates.find(x=>x.id===loadedTemplateId);if(!t){showToast('불러온 템플릿을 찾을 수 없습니다.');return}t.state=serializeState();t.updatedAt=new Date().toISOString();localStorage.setItem('wonwon_studio_templates_v2',JSON.stringify(templates));renderTemplateList();showToast(`“${t.name}” 템플릿을 현재 상태로 덮어썼습니다.`)}
+function deleteTemplate(id){templates=templates.filter(t=>t.id!==id);if(loadedTemplateId===id)loadedTemplateId=null;localStorage.setItem('wonwon_studio_templates_v2',JSON.stringify(templates));renderTemplateList();showToast('템플릿을 삭제했습니다.')}
+function exportJSON(){const payload={version:2,exportedAt:new Date().toISOString(),templates,current:serializeState()};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='wonwon_studio_backup_v2.json';a.click();URL.revokeObjectURL(url)}
+function isValidBackupPayload(p){if(!p||typeof p!=='object'||p.version!==2)return false;if(!Array.isArray(p.templates))return false;const c=p.current;if(!c||typeof c!=='object')return false;if(typeof c.canvasWidth!=='number'||typeof c.canvasHeight!=='number')return false;if(!c.background||typeof c.background!=='object')return false;if(!Array.isArray(c.layers))return false;return true}
+function importJSON(e){const f=e.target.files?.[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const p=JSON.parse(r.result);if(isValidBackupPayload(p)){templates=p.templates;localStorage.setItem('wonwon_studio_templates_v2',JSON.stringify(templates));loadedTemplateId=null;restoreState(p.current);renderTemplateList();showToast('백업을 정상적으로 복원했습니다.')}else if(Array.isArray(p)){showToast('구버전 템플릿은 자동 변환되지 않습니다.')}else{showToast('필수 항목이 빠졌거나 형식이 올바르지 않은 백업 파일입니다. 기존 템플릿은 유지됩니다.')}}catch{showToast('올바른 WONWON STUDIO 백업 파일이 아닙니다. 기존 템플릿은 유지됩니다.')}};r.readAsText(f);if(e.target)e.target.value='';const alt=document.getElementById('json-input-header');if(alt&&alt!==e.target)alt.value='';const base=document.getElementById('json-input');if(base&&base!==e.target)base.value=''}
+function downloadImage(){const hadSelection=activeLayerId,hadResize=resizeMode;activeLayerId=null;resizeMode=false;redrawCanvas();const a=document.createElement('a');a.download='wonwon_studio_image.png';a.href=canvas.toDataURL('image/png');a.click();activeLayerId=hadSelection;resizeMode=hadResize;redrawCanvas();showToast('PNG 이미지를 저장했습니다.')}
+
+renderEmojiUI();renderAsciiUI();preloadAllImages(()=>{saveState();updateUI();redrawCanvas()});
+</script>
+</body>
+</html>
