@@ -153,17 +153,17 @@ Canvas API를 활용하여 별도의 이미지 편집 라이브러리 없이 브
 ---
 
 # Project Structure
-WONWON-STUDIO
-│
-├── index.html
-├── css/
-│ └── style.css
-├── js/
-│ └── script.js
-├── assets/
-│ └── images/
-│
-└── README.md
+> WONWON-STUDIO
+> │
+> ├── index.html
+> ├── css/
+> │ └── style.css
+> ├── js/
+> │ └── script.js
+> ├── assets/
+> │ └── images/
+> │
+> └── README.md
 
 
 ---
